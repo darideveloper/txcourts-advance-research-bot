@@ -13,6 +13,11 @@ class Scraper(WebScraping):
         
         self.home_page = "https://research.txcourts.gov/CourtRecordsSearch/#!"
         
+        # Global data
+        self.global_selectors = {
+            "spinner": '[mdb-progress-spinner]',
+        }
+        
         # Setup
         self.__accept_close_session__()
         sleep(3)
@@ -49,7 +54,7 @@ class Scraper(WebScraping):
         
         selectors = {
             "loading": '[ng-if="IsLoading"]',
-            "table_rows": '#searchResultsTable tr',
+            "table_rows": '#searchResultsTable tbody tr',
             "case_link": 'a',
             "case_date": 'td:nth-child(6)',
         }
@@ -59,10 +64,12 @@ class Scraper(WebScraping):
         # Load research page
         search_page = f"{self.home_page}/search?q={case_id}"
         self.set_page(search_page)
+        sleep(2)
         self.refresh_selenium()
         
         # Wait to load results
         self.wait_die(selectors["loading"], 20)
+        sleep(2)
         self.delete_comments_js()
         self.refresh_selenium()
         
@@ -91,10 +98,6 @@ class Scraper(WebScraping):
             case_link (str): case link
         """
         
-        selectors = {
-            "loading": '[mdb-progress-spinner]'
-        }
-        
         print("Loading case page...")
         
         # Open case page
@@ -102,11 +105,10 @@ class Scraper(WebScraping):
         self.refresh_selenium()
         
         # Wait to fetch case data
-        self.wait_die(selectors["loading"], 20)
-        self.refresh_selenium()
-        
-        # Delete html comments
-        self.delete_comments_js()
+        for _ in range(2):
+            self.wait_die(self.global_selectors["spinner"], 20)
+            sleep(3)
+            self.refresh_selenium()
     
     def __get_defendants__(self) -> list[str]:
         """ Get defendants of the case.
@@ -116,10 +118,14 @@ class Scraper(WebScraping):
         """
         
         selectors = {
-            "parties": '#partiesTable tr',
+            "wrapper": "#partiesTable",
+            "parties": '#partiesTable tbody tr',
             "type": '[data-title="Type"]',
             "name": '[data-title="Name"]',
         }
+        
+        # Delete comments in section
+        self.delete_comments_js(selectors["wrapper"])
         
         # Loop partines to get defendants
         defendants = []
@@ -136,11 +142,43 @@ class Scraper(WebScraping):
         return list(set(defendants))
     
     def __get_filings__(self) -> list[str]:
-        """ Get last three filings of the case.
+        """ Get last three filings/events of the case.
         
         returns:
-            list[str]: list of filings for the case
+            list[str]: list of filings/events names for the case
         """
+        
+        selectors = {
+            "btn_events_date": '[ng-click="onFilingsSortChange()"]',
+            "filings": '#caseDetailsFilingsTable tr',
+            "type": 'td:nth-child(3)',
+            "comment": 'td:nth-child(4)',
+        }
+        
+        self.go_bottom()
+        
+        # Order events by last date
+        self.click_js(selectors["btn_events_date"])
+        self.refresh_selenium()
+        self.wait_die(self.global_selectors["spinner"], 20)
+        sleep(5)
+        self.refresh_selenium()
+        
+        # Loop filings to get the last three
+        filings = []
+        filings_num = len(self.get_elems(selectors["filings"]))
+        for filing_num in range(1, min(filings_num, 3) + 1):
+            filing_selector = f"{selectors['filings']}:nth-child({filing_num})"
+            filing_type = self.get_text(f"{filing_selector} {selectors['type']}")
+            filing_comment = self.get_text(f"{filing_selector} {selectors['comment']}")
+            
+            # Skip if the filing is empty
+            if not filing_type:
+                continue
+            
+            filings.append(f"{filing_type}-----{filing_comment}")
+            
+        return filings
     
     def __get_is_judgment__(self) -> bool:
         """ Validate if there is a judgment in the case.

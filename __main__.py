@@ -8,7 +8,7 @@ VAR = os.getenv("VAR")
 
 def main():
     scraper = Scraper()
-    scraper.get_case_data("2024TXA000958D1", "9/6/2024")
+    scraper.get_case_data("2018-79939", "11/21/2018")
 
 
 if __name__ == "__main__":

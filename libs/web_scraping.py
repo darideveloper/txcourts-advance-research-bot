@@ -810,8 +810,12 @@ class WebScraping ():
         script = f"window.localStorage.setItem('{key}', '{value}')"
         self.driver.execute_script(script)
         
-    def delete_comments_js(self):
-        """ Delete html comments with js """
+    def delete_comments_js(self, selector: str = 'body'):
+        """ Delete html comments with js
+        
+        Args:
+            selector: CSS selector of the element. Default is 'body'
+        """
         
         script = """
         // Function to remove all comment nodes
@@ -831,6 +835,9 @@ class WebScraping ():
         }
 
         // Start the removal process from the document body
-        removeComments(document.body);
-        """
+        const cssSelector = '{selector}'
+        const elem = document.querySelector(cssSelector)
+        removeComments(elem);
+        """.replace('{selector}', selector)
+        
         self.driver.execute_script(script)
