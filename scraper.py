@@ -1,4 +1,5 @@
 from time import sleep
+from datetime import datetime
 from libs.web_scraping import WebScraping
 
 
@@ -17,6 +18,7 @@ class Scraper(WebScraping):
         self.global_selectors = {
             "spinner": '[mdb-progress-spinner]',
         }
+        self.events = []
         
         # Setup
         self.__accept_close_session__()
@@ -105,6 +107,61 @@ class Scraper(WebScraping):
         # Wait to fetch case data
         for _ in range(2):
             self.wait_die(self.global_selectors["spinner"], 20)
+            
+    def __save_events__(self):
+        """ Load and save events data of the current case """
+        
+        selectors = {
+            "btn_events_date": '[ng-click="onFilingsSortChange()"]',
+            "events": '#caseDetailsFilingsTable tr',
+            "data": 'td:nth-child(1)',
+            "type": 'td:nth-child(3)',
+            "comment": 'td:nth-child(4)',
+            "btn_next": '.page-item:not(.disabled) '
+                        '[ng-click="selectPage(page + 1, $event)"]',
+        }
+        
+        self.go_bottom()
+        
+        # Loop events pages
+        events = []
+        while True:
+            
+            # Wait to load
+            self.wait_die(self.global_selectors["spinner"], 20)
+            sleep(2)
+            self.refresh_selenium()
+            
+            # Loop events to get data
+            events_num = len(self.get_elems(selectors["events"]))
+            for event_num in range(1, events_num + 1):
+                event_selector = f"{selectors['events']}:nth-child({event_num})"
+                event_date_str = self.get_text(f"{event_selector} {selectors['data']}")
+                event_type = self.get_text(f"{event_selector} {selectors['type']}")
+                event_comment = self.get_text(f"{event_selector} {selectors['comment']}")
+                
+                # Skip if the filing is empty
+                if not event_type:
+                    continue
+                
+                # Convert date to datetime in
+                # format 11/21/2018
+                event_date = datetime.strptime(event_date_str, "%m/%d/%Y")
+                
+                events.append({
+                    "type": event_type,
+                    "comment": event_comment,
+                    "date": event_date,
+                })
+                
+            # Go next page
+            next_elem = self.get_elems(selectors["btn_next"])
+            if not next_elem:
+                break
+            
+            self.click_js(selectors["btn_next"])
+            
+        self.events = events
     
     def __get_defendants__(self) -> list[str]:
         """ Get defendants of the case.
@@ -148,35 +205,12 @@ class Scraper(WebScraping):
         
         print("\tGetting filings...")
         
-        selectors = {
-            "btn_events_date": '[ng-click="onFilingsSortChange()"]',
-            "filings": '#caseDetailsFilingsTable tr',
-            "type": 'td:nth-child(3)',
-            "comment": 'td:nth-child(4)',
-        }
+        # Get type and comments from last 3 events
+        filings = list(map(
+            lambda event: f"{event['type']}-----{event['comment']}",
+            self.events[-3:]
+        ))
         
-        self.go_bottom()
-        
-        # Order events by last date
-        self.click_js(selectors["btn_events_date"])
-        self.wait_die(self.global_selectors["spinner"], 20)
-        sleep(4)
-        self.refresh_selenium()
-                
-        # Loop filings to get the last three
-        filings = []
-        filings_num = len(self.get_elems(selectors["filings"]))
-        for filing_num in range(1, min(filings_num, 3) + 1):
-            filing_selector = f"{selectors['filings']}:nth-child({filing_num})"
-            filing_type = self.get_text(f"{filing_selector} {selectors['type']}")
-            filing_comment = self.get_text(f"{filing_selector} {selectors['comment']}")
-            
-            # Skip if the filing is empty
-            if not filing_type:
-                continue
-            
-            filings.append(f"{filing_type}-----{filing_comment}")
-            
         return filings
     
     def __get_is_judgment__(self) -> bool:
@@ -228,6 +262,7 @@ class Scraper(WebScraping):
         
         # Get case data
         print("Getting case data...")
+        self.__save_events__()
         defendants = self.__get_defendants__()
         filings = self.__get_filings__()
         is_judgment = self.__get_is_judgment__()
