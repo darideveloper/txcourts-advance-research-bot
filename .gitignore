@@ -1,0 +1,13 @@
+__pycache__
+*__pycache__
+*temp.*
+temp.*
+*.log*
+*.zip
+venv
+.env
+debug.*
+db.*
+*.sqlite3
+*.pyc
+credentials.json
