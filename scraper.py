@@ -213,32 +213,23 @@ class Scraper(WebScraping):
         
         return filings
     
-    def __get_is_judgment__(self) -> bool:
-        """ Validate if there is a judgment in event's comments.
+    def __get_in_events__(self, keyword: str) -> bool:
+        """ Validate if specific keyword is in types or event comments
+        
+        Args:
+            keyword (str): keyword to search
 
         Returns:
-            bool: True if there is a judgment, False otherwise
+            bool: True if there is a match, False otherwise
         """
         
-        print("\tChecking if there is a judgment...")
+        print(f"\tChecking if there is a '{keyword}' events...")
         
         comments = list(map(lambda event: event["comment"], self.events))
-        is_judgment = any("judgment" in comment.lower() for comment in comments)
-        return is_judgment
-    
-    def __get_is_trial__(self) -> bool:
-        """ Validate if there is a trial in the case.
-
-        Returns:
-            bool: True if there is a trial, False otherwise
-        """
-    
-    def __get_is_sale__(self) -> bool:
-        """ Validate if there is a sale in the case.
-
-        Returns:
-            bool: True if there is a sale, False otherwise
-        """
+        types = list(map(lambda event: event["type"], self.events))
+        in_comments = any(keyword in comment.lower() for comment in comments)
+        in_types = any(keyword in type.lower() for type in types)
+        return in_comments or in_types
     
     def __get_case_status__(self) -> str:
         """ Return case status.
@@ -269,9 +260,9 @@ class Scraper(WebScraping):
         self.__save_events__()
         defendants = self.__get_defendants__()
         filings = self.__get_filings__()
-        is_judgment = self.__get_is_judgment__()
-        is_trial = self.__get_is_trial__()
-        is_sale = self.__get_is_sale__()
+        is_judgment = self.__get_in_events__("judgment")
+        is_trial = self.__get_in_events__("trial")
+        is_sale = self.__get_in_events__("sale")
         case_status = self.__get_case_status__()
         defendants_attorneys = self.__get_defendants_attorneys__()
         
