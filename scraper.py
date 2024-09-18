@@ -214,13 +214,17 @@ class Scraper(WebScraping):
         return filings
     
     def __get_is_judgment__(self) -> bool:
-        """ Validate if there is a judgment in the case.
+        """ Validate if there is a judgment in event's comments.
 
         Returns:
             bool: True if there is a judgment, False otherwise
         """
         
         print("\tChecking if there is a judgment...")
+        
+        comments = list(map(lambda event: event["comment"], self.events))
+        is_judgment = any("judgment" in comment.lower() for comment in comments)
+        return is_judgment
     
     def __get_is_trial__(self) -> bool:
         """ Validate if there is a trial in the case.
