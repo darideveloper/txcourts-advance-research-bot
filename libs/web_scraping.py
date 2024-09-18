@@ -26,7 +26,7 @@ class WebScraping ():
                  incognito: bool = False, experimentals: bool = True,
                  start_killing: bool = False, start_openning: bool = True,
                  width: int = 1280, height: int = 720,
-                 mute: bool = True):
+                 mute: bool = True, auto_chrome_folder_windows: bool = False):
         
         """ Save settings and create a new instance of the web browser
 
@@ -72,6 +72,12 @@ class WebScraping ():
         self.__mute__ = mute
         
         self.__web_page__ = None
+        
+        # Fix chrome folder
+        if auto_chrome_folder_windows:
+            username = os.getlogin()
+            self.__chrome_folder__ = f"C:\\Users\\{username}\\AppData"
+            self.__chrome_folder__ += "\\Local\\Google\\Chrome\\User Data"
 
         # Kill chrome from terminal
         if start_killing:
