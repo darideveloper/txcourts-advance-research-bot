@@ -133,7 +133,7 @@ class Scraper(WebScraping):
             if "defendant" in party_type:
                 defendants.append(party_name)
                 
-        return defendants
+        return list(set(defendants))
     
     def __get_filings__(self) -> list[str]:
         """ Get last three filings of the case.
