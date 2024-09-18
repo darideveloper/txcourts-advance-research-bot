@@ -48,14 +48,13 @@ class Scraper(WebScraping):
         """
         
         selectors = {
-            "loading_search": '[ng-if="IsLoading"]',
+            "loading": '[ng-if="IsLoading"]',
             "table_rows": '#searchResultsTable tr',
             "case_link": 'a',
             "case_date": 'td:nth-child(6)',
-            "loading_case": '[mdb-progress-spinner]'
         }
         
-        print(f"Searching case '{case_id}'...")
+        print(f"\tSearching case '{case_id}'...")
         
         # Load research page
         search_page = f"{self.home_page}/search?q={case_id}"
@@ -63,7 +62,7 @@ class Scraper(WebScraping):
         self.refresh_selenium()
         
         # Wait to load results
-        self.wait_die(selectors["loading_search"], 20)
+        self.wait_die(selectors["loading"], 20)
         self.delete_comments_js()
         self.refresh_selenium()
         
@@ -83,17 +82,31 @@ class Scraper(WebScraping):
             case_link = self.get_attrib(case_link_selector, "href")
         
         # End when the case is found
-        if not case_link:
-            print(f"Case '{case_id} not found")
-            return False
+        return case_link
+    
+    def __load_case_page__(self, case_link: str) -> bool:
+        """ Load case page and wait to load.
+        
+        Args:
+            case_link (str): case link
+        """
+        
+        selectors = {
+            "loading": '[mdb-progress-spinner]'
+        }
+        
+        print("Loading case page...")
         
         # Open case page
         self.set_page(case_link)
         self.refresh_selenium()
-        self.wait_die(selectors["loading_case"], 20)
+        
+        # Wait to fetch case data
+        self.wait_die(selectors["loading"], 20)
         self.refresh_selenium()
+        
+        # Delete html comments
         self.delete_comments_js()
-        return True
     
     def __get_defendants__(self) -> list[str]:
         """ Get defendants of the case.
@@ -168,9 +181,11 @@ class Scraper(WebScraping):
     def get_case_data(self, case_id: str, date: str) -> dict:
         
         # Search case
-        case_found = self.__search_case__(case_id, date)
-        if not case_found:
+        case_link = self.__search_case__(case_id, date)
+        if not case_link:
+            print(f"Case '{case_id}' not found")
             return None
+        self.__load_case_page__(case_link)
         
         # Get case data
         print("Getting case data...")
