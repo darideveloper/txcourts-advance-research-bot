@@ -59,17 +59,15 @@ class Scraper(WebScraping):
             "case_date": 'td:nth-child(6)',
         }
         
-        print(f"\tSearching case '{case_id}'...")
+        print(f"\nSearching case '{case_id}'...")
         
         # Load research page
         search_page = f"{self.home_page}/search?q={case_id}"
         self.set_page(search_page)
         sleep(2)
-        self.refresh_selenium()
         
         # Wait to load results
         self.wait_die(selectors["loading"], 20)
-        sleep(2)
         self.delete_comments_js()
         self.refresh_selenium()
         
@@ -107,8 +105,6 @@ class Scraper(WebScraping):
         # Wait to fetch case data
         for _ in range(2):
             self.wait_die(self.global_selectors["spinner"], 20)
-            sleep(3)
-            self.refresh_selenium()
     
     def __get_defendants__(self) -> list[str]:
         """ Get defendants of the case.
@@ -123,6 +119,8 @@ class Scraper(WebScraping):
             "type": '[data-title="Type"]',
             "name": '[data-title="Name"]',
         }
+        
+        print("\tGetting defendants...")
         
         # Delete comments in section
         self.delete_comments_js(selectors["wrapper"])
@@ -148,6 +146,8 @@ class Scraper(WebScraping):
             list[str]: list of filings/events names for the case
         """
         
+        print("\tGetting filings...")
+        
         selectors = {
             "btn_events_date": '[ng-click="onFilingsSortChange()"]',
             "filings": '#caseDetailsFilingsTable tr',
@@ -159,11 +159,10 @@ class Scraper(WebScraping):
         
         # Order events by last date
         self.click_js(selectors["btn_events_date"])
-        self.refresh_selenium()
         self.wait_die(self.global_selectors["spinner"], 20)
-        sleep(5)
+        sleep(4)
         self.refresh_selenium()
-        
+                
         # Loop filings to get the last three
         filings = []
         filings_num = len(self.get_elems(selectors["filings"]))
@@ -186,6 +185,8 @@ class Scraper(WebScraping):
         Returns:
             bool: True if there is a judgment, False otherwise
         """
+        
+        print("\tChecking if there is a judgment...")
     
     def __get_is_trial__(self) -> bool:
         """ Validate if there is a trial in the case.

@@ -424,21 +424,23 @@ class WebScraping ():
             time_out (int): time to wait
         """
 
+        self.refresh_selenium()
+
         total_time = 0
 
         while True:
             if total_time < time_out:
                 total_time += 1
-                try:
-                    elem = self.driver.find_element(By.CSS_SELECTOR, selector)
-                    elem.text
-                    time.sleep(self.basetime)
-                    continue
-                except Exception:
+                elem = self.get_elems(selector)
+                if not elem:
                     break
+                self.refresh_selenium()
+                continue
             else:
                 error = f"Time out exeded. The element {selector} is until in the page"
                 raise Exception(error)
+            
+        self.refresh_selenium()
 
     def get_text(self, selector: str) -> str:
         """ Return text for specific element in the page
