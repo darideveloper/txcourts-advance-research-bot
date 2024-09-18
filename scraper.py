@@ -1,3 +1,4 @@
+from time import sleep
 from libs.web_scraping import WebScraping
 
 
@@ -10,14 +11,89 @@ class Scraper(WebScraping):
             start_killing=True,
         )
         
-    def __search_case__(self, case_id: str, date: str):
+        self.home_page = "https://research.txcourts.gov/CourtRecordsSearch/#!"
+        
+        # Setup
+        self.__accept_close_session__()
+        sleep(3)
+    
+    def __accept_close_session__(self):
+        """ Accept message for closing session (if exists) """
+        
+        selectors = {
+            "btn_close": '[ng-click="endOtherSessions()"]'
+        }
+        
+        print("Looking for close session message")
+        
+        self.set_page(self.home_page)
+        sleep(2)
+        self.refresh_selenium()
+        
+        btn_close_elem = self.get_elems(selectors["btn_close"])
+        if btn_close_elem:
+            self.click(selectors["btn_close"])
+            self.refresh_selenium()
+    
+    def __search_case__(self, case_id: str, date: str) -> bool:
         """ Search case in the website.
 
         Args:
             case_id (str): case identifier
             date (str): case date (to filter if there are multiple cases
                 with the same identifier)
+        
+        Returns:
+            bool: True if the case is found, False otherwise
         """
+        
+        selectors = {
+            "loading_search": '[ng-if="IsLoading"]',
+            "table_rows": '#searchResultsTable tr',
+            "case_link": 'a',
+            "case_date": 'td:nth-child(6)',
+            "loading_case": '[mdb-progress-spinner]'
+        }
+        
+        print(f"Searching case '{case_id}'...")
+        
+        # Load research page
+        search_page = f"{self.home_page}/search?q={case_id}"
+        self.set_page(search_page)
+        self.refresh_selenium()
+        
+        # Wait to load results
+        self.wait_die(selectors["loading_search"], 20)
+        self.delete_comments_js()
+        self.refresh_selenium()
+        
+        # Find the correct case
+        case_link = None
+        rows_num = len(self.get_elems(selectors["table_rows"]))
+        for row_num in range(1, rows_num + 1):
+            row_selector = f"{selectors['table_rows']}:nth-child({row_num})"
+            case_link_selector = f"{row_selector} {selectors['case_link']}"
+            case_date_selector = f"{row_selector} {selectors['case_date']}"
+            
+            # Validate date only if there are more than one case
+            case_date = self.get_text(case_date_selector)
+            if rows_num > 1 and date != case_date:
+                continue
+            
+            case_link = self.get_attrib(case_link_selector, "href")
+        
+        # End when the case is found
+        if not case_link:
+            print(f"Case '{case_id} not found")
+            return False
+        
+        # Open case page
+        self.set_page(case_link)
+        self.refresh_selenium()
+        self.wait_die(selectors["loading_case"], 20)
+        self.refresh_selenium()
+        self.delete_comments_js()
+        return True
     
     def __get_defendants__(self) -> list[str]:
         """ Get defendants of the case.
@@ -25,6 +101,26 @@ class Scraper(WebScraping):
         Returns:
             list: list of defendants (usually two)
         """
+        
+        selectors = {
+            "parties": '#partiesTable tr',
+            "type": '[data-title="Type"]',
+            "name": '[data-title="Name"]',
+        }
+        
+        # Loop partines to get defendants
+        defendants = []
+        parties_num = len(self.get_elems(selectors["parties"]))
+        for party_num in range(1, parties_num + 1):
+            party_selector = f"{selectors['parties']}:nth-child({party_num})"
+            party_type = self.get_text(f"{party_selector} {selectors['type']}").lower()
+            party_name = self.get_text(f"{party_selector} {selectors['name']}")
+            
+            # Check if the party is a defendant
+            if "defendant" in party_type:
+                defendants.append(party_name)
+                
+        return defendants
     
     def __get_filings__(self) -> list[str]:
         """ Get last three filings of the case.
@@ -72,9 +168,12 @@ class Scraper(WebScraping):
     def get_case_data(self, case_id: str, date: str) -> dict:
         
         # Search case
-        self.__search_case__(case_id, date)
+        case_found = self.__search_case__(case_id, date)
+        if not case_found:
+            return None
         
         # Get case data
+        print("Getting case data...")
         defendants = self.__get_defendants__()
         filings = self.__get_filings__()
         is_judgment = self.__get_is_judgment__()

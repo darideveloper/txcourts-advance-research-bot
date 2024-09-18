@@ -809,3 +809,28 @@ class WebScraping ():
         
         script = f"window.localStorage.setItem('{key}', '{value}')"
         self.driver.execute_script(script)
+        
+    def delete_comments_js(self):
+        """ Delete html comments with js """
+        
+        script = """
+        // Function to remove all comment nodes
+        function removeComments(node) {
+            // Loop through all child nodes
+            for (let i = node.childNodes.length - 1; i >= 0; i--) {
+                const child = node.childNodes[i];
+                // If it's a comment node (nodeType 8), remove it
+                if (child.nodeType === 8) {
+                    node.removeChild(child);
+                } else if (child.nodeType === 1) {
+                    // If it's an element node (nodeType 1),
+                    // recursively check its children
+                    removeComments(child);
+                }
+            }
+        }
+
+        // Start the removal process from the document body
+        removeComments(document.body);
+        """
+        self.driver.execute_script(script)
