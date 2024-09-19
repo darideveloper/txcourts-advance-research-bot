@@ -121,6 +121,8 @@ class Scraper(WebScraping):
                         '[ng-click="selectPage(page + 1, $event)"]',
         }
         
+        print("Saving events data...")
+        
         self.go_bottom()
         
         # Loop events pages
@@ -238,6 +240,18 @@ class Scraper(WebScraping):
             str: Case status value. Return None if the status is not
                 found.
         """
+        
+        selectors = {
+            "status": '[ng-bind="::case.status"]'
+        }
+        
+        print("\tGetting case status...")
+        
+        status_elem = self.get_elems(selectors["status"])
+        if not status_elem:
+            return None
+        
+        return self.get_text(selectors["status"])
     
     def __get_defendants_attorneys__(self) -> list:
         """ Get defendants' attorneys.
@@ -256,7 +270,6 @@ class Scraper(WebScraping):
         self.__load_case_page__(case_link)
         
         # Get case data
-        print("Getting case data...")
         self.__save_events__()
         defendants = self.__get_defendants__()
         filings = self.__get_filings__()
