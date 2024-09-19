@@ -81,13 +81,7 @@ class WebScraping ():
 
         # Kill chrome from terminal
         if start_killing:
-            windows = 'taskkill /IM "chrome.exe" /F > nul 2>&1'
-            linux = "pkill -9 -f chrome > /dev/null 2>&1"
-            
-            if os.name == "nt":
-                os.system(windows)
-            else:
-                os.system(linux)
+            self.__kill_chrome_terminal__()
             
         # Create and instance of the web browser
         if self.__start_openning__:
@@ -99,6 +93,18 @@ class WebScraping ():
         # Set time out
         if time_out > 0:
             self.driver.set_page_load_timeout(time_out)
+
+    def __kill_chrome_terminal__(self):
+        """ Kill chrome from terminal
+        """
+        
+        windows = 'taskkill /IM "chrome.exe" /F > nul 2>&1'
+        linux = "pkill -9 -f chrome > /dev/null 2>&1"
+        
+        if os.name == "nt":
+            os.system(windows)
+        else:
+            os.system(linux)
 
     def set_cookies(self, cookies: list):
         """ Get list of cookies, formatted, from 'cookies.json' file
@@ -777,12 +783,20 @@ class WebScraping ():
         script = f"document.body.style.zoom='{percentage}%'"
         self.driver.execute_script(script)
 
-    def kill(self):
-        """ Detect and close all tabs """
+    def kill(self, kill_terminal: bool = True):
+        """ Detect and close all tabs and optionally kill chrome from terminal
+        
+        Args:
+            kill_terminal (bool): if True kill chrome from terminal too
+        """
+                
         tabs = self.driver.window_handles
         for _ in tabs:
             self.switch_to_tab(0)
             self.end_browser()
+            
+        if kill_terminal:
+            self.__kill_chrome_terminal__()
 
     def scroll(self, selector: str, scroll_x: int, scroll_y: int):
         """ Scroll X or Y in specific element of the page
@@ -841,3 +855,14 @@ class WebScraping ():
         """.replace('{selector}', selector)
         
         self.driver.execute_script(script)
+        
+    def clear_input(self, selector: str):
+        """ Clear the input value with js
+        
+        Args:
+            selector (str): CSS selector of the element
+        """
+        
+        elem = self.get_elem(selector)
+        code = "arguments[0].value = '';"
+        self.driver.execute_script(code, elem)

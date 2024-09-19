@@ -9,6 +9,8 @@ load_dotenv()
 GOOGLE_SHEET_LINK = os.getenv("GOOGLE_SHEET_LINK")
 SHEET_INPUT = os.getenv("SHEET_INPUT")
 SHEET_OUTPUT = os.getenv("SHEET_OUTPUT")
+USER_EMAIL = os.getenv("USER_EMAIL")
+USER_PASSWORD = os.getenv("USER_PASSWORD")
 
 # Paths
 current_path = os.path.dirname(os.path.abspath(__file__))
@@ -29,7 +31,7 @@ def main():
     input_data = data_manager.get_input_data()
     
     # Start scraper
-    scraper = Scraper()
+    scraper = Scraper(USER_EMAIL, USER_PASSWORD)
 
     # Scrape each case
     for case_data in input_data:
