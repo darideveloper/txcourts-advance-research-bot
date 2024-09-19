@@ -22,8 +22,25 @@ class Scraper(WebScraping):
         self.parties = []
         
         # Setup
+        self.set_page(self.home_page)
+        sleep(2)
+        self.refresh_selenium()
+        self.__validate_login__()
         self.__accept_close_session__()
         sleep(3)
+        
+    def __validate_login__(self):
+        """ Validate if the user is logged in """
+        
+        selectors = {
+            "btn_login": '#signInLink'
+        }
+        
+        btn_login_btn = self.get_elems(selectors["btn_login"])
+        if btn_login_btn:
+            print(">>> ERROR: User is not logged in")
+            print("Open chrome and login to the website manually")
+            quit()
     
     def __accept_close_session__(self):
         """ Accept message for closing session (if exists) """
@@ -33,10 +50,6 @@ class Scraper(WebScraping):
         }
         
         print("Looking for close session message")
-        
-        self.set_page(self.home_page)
-        sleep(2)
-        self.refresh_selenium()
         
         btn_close_elem = self.get_elems(selectors["btn_close"])
         if btn_close_elem:

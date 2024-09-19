@@ -19,6 +19,11 @@ def main():
     # Main workflow: scrape each ready case from the input sheet,
     # update the output sheet with the scraped data, and update the status
     
+    # Header
+    print("\n----------------------------------")
+    print("TXCourts Research Bot")
+    print("----------------------------------\n")
+    
     data_manager = DataManager(GOOGLE_SHEET_LINK, creds_path,
                                SHEET_INPUT, SHEET_OUTPUT)
     input_data = data_manager.get_input_data()
