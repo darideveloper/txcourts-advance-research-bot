@@ -18,6 +18,7 @@ class DataManager(SheetsManager):
         # Save sheets and columns
         self.sheet_input = sheet_input
         self.sheet_output = sheet_output
+        self.input_data = []
         
         super().__init__(google_sheet_link, creds_path)
         
@@ -35,6 +36,7 @@ class DataManager(SheetsManager):
         
         # Get all values from the sheet
         data = self.get_data()
+        self.input_data = data
         data_ready = list(filter(lambda row: row["Status"] == "ready", data))
         
         # Filter only ready registers and required columns
@@ -48,7 +50,7 @@ class DataManager(SheetsManager):
         """
         pass
     
-    def update_input_status(self, row: int, status: str):
+    def update_input_status(self, case_id: int, status: str):
         """ Update status of case input row
 
         Args:
