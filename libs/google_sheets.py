@@ -51,18 +51,17 @@ class SheetsManager ():
         if not data:
             print("THERE IS NO NEW INFORMATION TO WRITE IN THE FILE.")
         else:
-            print("Writing information on spreadsheet...")
-
+            
             # Loop for each row of data
             for row_data in data:
 
                 # Set the position of the next row. Omit the header
                 row_index = data.index(row_data) + row
 
+                column_index = column
                 for cell in row_data:
-                    column_index = row_data.index(cell) + column
-
                     self.write_cell(cell, row_index, column_index)
+                    column_index += 1
 
     def get_data(self):
         """ Read all records of the sheet"""

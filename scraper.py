@@ -163,7 +163,7 @@ class Scraper(WebScraping):
             "case_date": 'td:nth-child(6)',
         }
         
-        print(f"\nSearching case '{case_id}'...")
+        print(f"Searching case '{case_id}'...")
         
         # Load research page
         search_page = f"{self.home_page}/search?q={case_id}"
@@ -221,7 +221,7 @@ class Scraper(WebScraping):
             "attorney": '[data-title="Attorneys"]'
         }
         
-        print("Saving parties data...")
+        print("Getting parties data...")
         
         # Delete comments in section
         self.delete_comments_js(selectors["wrapper"])
@@ -257,7 +257,7 @@ class Scraper(WebScraping):
                         '[ng-click="selectPage(page + 1, $event)"]',
         }
         
-        print("Saving events data...")
+        print("Getting events data...")
         
         self.go_bottom()
         

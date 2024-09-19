@@ -42,14 +42,60 @@ class DataManager(SheetsManager):
         # Filter only ready registers and required columns
         return data_ready
     
-    def write_output_row(self, row_data: list[str]):
+    def write_output_row(self, case_data: dict, case_id: str, case_date: str):
         """ Write case row in output sheet
 
         Args:
-            row_data (list[str]): row data
+            case_data (dict): case data
+                defendants (list): list of defendants
+                filings (list): list of filings
+                is_judgment (bool): is judgment
+                is_trial (bool): is trial
+                is_sale (bool): is sale
+                case_status (str): case status
+                attorneys (list): list of attorneys
         """
-        pass
-    
+        
+        print(f"Writing output data for case {case_id}...")
+        
+        # Fix data
+        
+        # None to empty string
+        if case_data["case_status"] is None:
+            case_data["case_status"] = ""
+        
+        # Fill filings with empty strings
+        if len(case_data["filings"]) < 3:
+            case_data["filings"] += [""] * (3 - len(case_data["filings"]))
+            
+        # Bool values to string
+        bool_columns = ["is_judgment", "is_trial", "is_sale"]
+        for column in bool_columns:
+            if case_data[column]:
+                case_data[column] = "Yes"
+            else:
+                case_data[column] = "No"
+            
+        # Create row data: case_id, case_date, defendants, num_defendants,
+        # filing_1, filing_2, filing_3, is_judgment, is_trial, is_sale, case_status,
+        # attorneys
+        row_data = []
+        row_data.append(case_id)
+        row_data.append(case_date)
+        row_data.append("\n".join(case_data["defendants"]))
+        row_data.append(len(case_data["defendants"]))
+        row_data += case_data["filings"]
+        row_data.append(case_data["is_judgment"])
+        row_data.append(case_data["is_trial"])
+        row_data.append(case_data["is_sale"])
+        row_data.append(case_data["case_status"])
+        row_data.append("\n".join(case_data["attorneys"]))
+        
+        # Write row in output sheet
+        self.set_sheet(self.sheet_output)
+        last_row = self.get_rows_num()
+        self.write_data([row_data], row=last_row + 1)
+            
     def update_input_status(self, case_id: int, status: str):
         """ Update status of case input row
 
