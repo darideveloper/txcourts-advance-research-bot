@@ -81,7 +81,6 @@ class WebScraping ():
 
         # Kill chrome from terminal
         if start_killing:
-            print("\nTry to kill chrome...")
             windows = 'taskkill /IM "chrome.exe" /F > nul 2>&1'
             linux = "pkill -9 -f chrome > /dev/null 2>&1"
             
@@ -89,7 +88,6 @@ class WebScraping ():
                 os.system(windows)
             else:
                 os.system(linux)
-            print("Ok\n")
             
         # Create and instance of the web browser
         if self.__start_openning__:
