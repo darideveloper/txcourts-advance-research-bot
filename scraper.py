@@ -19,6 +19,7 @@ class Scraper(WebScraping):
             "spinner": '[mdb-progress-spinner]',
         }
         self.events = []
+        self.parties = []
         
         # Setup
         self.__accept_close_session__()
@@ -107,7 +108,41 @@ class Scraper(WebScraping):
         # Wait to fetch case data
         for _ in range(2):
             self.wait_die(self.global_selectors["spinner"], 20)
+    
+    def __save_parties__(self):
+        """ Load and save parties data of the current case """
+        
+        selectors = {
+            "wrapper": "#partiesTable",
+            "parties": '#partiesTable tbody tr',
+            "type": '[data-title="Type"]',
+            "name": '[data-title="Name"]',
+            "attorney": '[data-title="Attorneys"]'
+        }
+        
+        print("Saving parties data...")
+        
+        # Delete comments in section
+        self.delete_comments_js(selectors["wrapper"])
+        
+        # Save parties data
+        parties = []
+        parties_num = len(self.get_elems(selectors["parties"]))
+        for party_num in range(1, parties_num + 1):
+            party_selector = f"{selectors['parties']}:nth-child({party_num})"
+            party_type = self.get_text(f"{party_selector} {selectors['type']}").lower()
+            party_name = self.get_text(f"{party_selector} {selectors['name']}")
+            party_attorney = self.get_text(f"{party_selector} {selectors['attorney']}")
             
+            # Save parties
+            parties.append({
+                "type": party_type,
+                "name": party_name,
+                "attorney": party_attorney,
+            })
+                
+        self.parties = parties
+    
     def __save_events__(self):
         """ Load and save events data of the current case """
         
@@ -165,38 +200,34 @@ class Scraper(WebScraping):
             
         self.events = events
     
-    def __get_defendants__(self) -> list[str]:
-        """ Get defendants of the case.
+    def __get_defendants_attorneys__(self) -> tuple[list, list]:
+        """ Get defendants of the case from parties daya
 
         Returns:
             list: list of defendants (usually two)
         """
         
-        selectors = {
-            "wrapper": "#partiesTable",
-            "parties": '#partiesTable tbody tr',
-            "type": '[data-title="Type"]',
-            "name": '[data-title="Name"]',
-        }
+        print("\tGetting defendants attorneys...")
         
-        print("\tGetting defendants...")
+        # Get defendants names and attorneys
+        defendants_rows = list(filter(
+            lambda party: "defendant" in party["type"].lower(),
+            self.parties
+        ))
+        defendants_names = list(map(
+            lambda party: party["name"],
+            defendants_rows
+        ))
+        defendants_attorneys = list(map(
+            lambda party: party["attorney"],
+            defendants_rows
+        ))
         
-        # Delete comments in section
-        self.delete_comments_js(selectors["wrapper"])
-        
-        # Loop partines to get defendants
-        defendants = []
-        parties_num = len(self.get_elems(selectors["parties"]))
-        for party_num in range(1, parties_num + 1):
-            party_selector = f"{selectors['parties']}:nth-child({party_num})"
-            party_type = self.get_text(f"{party_selector} {selectors['type']}").lower()
-            party_name = self.get_text(f"{party_selector} {selectors['name']}")
-            
-            # Check if the party is a defendant
-            if "defendant" in party_type:
-                defendants.append(party_name)
+        # Remove duplicates
+        defendants_names = list(set(defendants_names))
+        defendants_attorneys = list(set(defendants_attorneys))
                 
-        return list(set(defendants))
+        return defendants_names, defendants_attorneys
     
     def __get_filings__(self) -> list[str]:
         """ Get last three filings/events of the case.
@@ -253,13 +284,6 @@ class Scraper(WebScraping):
         
         return self.get_text(selectors["status"])
     
-    def __get_defendants_attorneys__(self) -> list:
-        """ Get defendants' attorneys.
-
-        Returns:
-            list: list of attorneys for the defendants
-        """
-    
     def get_case_data(self, case_id: str, date: str) -> dict:
         
         # Search case
@@ -270,14 +294,14 @@ class Scraper(WebScraping):
         self.__load_case_page__(case_link)
         
         # Get case data
+        self.__save_parties__()
         self.__save_events__()
-        defendants = self.__get_defendants__()
+        defendants, attorneys = self.__get_defendants_attorneys__()
         filings = self.__get_filings__()
         is_judgment = self.__get_in_events__("judgment")
         is_trial = self.__get_in_events__("trial")
         is_sale = self.__get_in_events__("sale")
         case_status = self.__get_case_status__()
-        defendants_attorneys = self.__get_defendants_attorneys__()
         
         # Return case data
         return {
@@ -287,5 +311,6 @@ class Scraper(WebScraping):
             "is_trial": is_trial,
             "is_sale": is_sale,
             "case_status": case_status,
-            "defendants_attorneys": defendants_attorneys,
+            "defendants": defendants,
+            "attorneys": attorneys,
         }
