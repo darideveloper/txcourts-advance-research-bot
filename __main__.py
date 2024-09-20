@@ -31,7 +31,7 @@ def main():
     input_data = data_manager.get_input_data()
 
     # Start scraper
-    # scraper = Scraper(USER_EMAIL, USER_PASSWORD)
+    scraper = Scraper(USER_EMAIL, USER_PASSWORD)
 
     # Scrape each case
     for case_data in input_data:
@@ -39,24 +39,14 @@ def main():
         case_number = case_data["Case Number"]
         case_date = case_data["Case Filed Date"]
         print("\n------------------")
-        # case_data = scraper.get_case_data(case_number, case_date)
-        case_data = {
-            'defendants': ['HEIRS Of SARA ALICIA P CRUZ', 'HEIRS Of ROBERTO CRUZ'],
-            'filings': [
-                'Petition-----ORIGINAL PETITION TO COLLECT DELINQUENT TAXES'
-            ],
-            'is_judgment': False,
-            'is_trial': False,
-            'is_sale': False,
-            'case_status': None,
-            'attorneys': ['']
-        }
+        case_data = scraper.get_case_data(case_number, case_date)
 
         # Save case data in output sheet
         data_manager.write_output_row(case_data, case_number, case_date)
 
         # Update status in input sheet
-        data_manager.update_input_status(case_data["Case Number"], "scraped")
+        data_manager.update_input_status(case_number, "scraped")
+        print()
 
     print("All cases have been scraped.")
 

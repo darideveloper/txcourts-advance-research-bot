@@ -114,6 +114,7 @@ class Scraper(WebScraping):
         self.send_data(selectors["password"], self.user_password)
         
         self.click_js(selectors["btn_submit"])
+        sleep(5)
         self.refresh_selenium()
         
         self.__accept_close_session__()
