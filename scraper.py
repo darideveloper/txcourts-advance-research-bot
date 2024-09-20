@@ -341,9 +341,10 @@ class Scraper(WebScraping):
         print("\tGetting filings...")
         
         # Get type and comments from last 3 events
+        events_reverse = self.events[::-1]
         filings = list(map(
             lambda event: f"{event['type']}-----{event['comment']}",
-            self.events[-3:]
+            events_reverse
         ))
         
         return filings

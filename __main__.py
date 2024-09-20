@@ -40,6 +40,11 @@ def main():
         case_date = case_data["Case Filed Date"]
         print("\n------------------")
         case_data = scraper.get_case_data(case_number, case_date)
+        
+        # Catch no data
+        if not case_data:
+            print(f"No data found for case '{case_number}'.")
+            continue
 
         # Save case data in output sheet
         data_manager.write_output_row(case_data, case_number, case_date)
