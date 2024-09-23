@@ -50,8 +50,8 @@ def main():
         data_manager.write_output_row(case_data, case_number, case_date)
 
         # Update status in input sheet
-        data_manager.update_input_status(case_number, "scraped")
-        print()
+        data_manager.update_input_status(case_number)
+        print(f"Case '{case_number}' has been scraped.")
 
     print("All cases have been scraped.")
 

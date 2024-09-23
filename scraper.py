@@ -66,6 +66,8 @@ class Scraper(WebScraping):
         with open(cookies_path, "rb") as file:
             cookies = pickle.load(file)
         self.set_cookies(cookies)
+        self.driver.refresh()
+        self.refresh_selenium()
     
     def __validate_login__(self) -> bool:
         """ Validate if user is logged in

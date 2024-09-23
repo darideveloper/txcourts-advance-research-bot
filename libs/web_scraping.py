@@ -843,7 +843,9 @@ class WebScraping ():
                 } else if (child.nodeType === 1) {
                     // If it's an element node (nodeType 1),
                     // recursively check its children
-                    removeComments(child);
+                    if (child && child.childNodes) {
+                        removeComments(child);
+                    }
                 }
             }
         }

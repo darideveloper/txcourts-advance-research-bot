@@ -56,7 +56,7 @@ class DataManager(SheetsManager):
                 attorneys (list): list of attorneys
         """
         
-        print(f"Writing output data for case {case_id}...")
+        print("Writing output data in output sheet...")
         
         # Fix data
         
@@ -91,18 +91,29 @@ class DataManager(SheetsManager):
         row_data.append(case_data["case_status"])
         row_data.append("\n".join(case_data["attorneys"]))
         
-        # Write row in output sheet
+        # Move to output sheet
         self.set_sheet(self.sheet_output)
+        
+        # Write row in output sheet
         last_row = self.get_rows_num()
         self.write_data([row_data], row=last_row + 1)
             
-    def update_input_status(self, case_id: int, status: str):
+    def update_input_status(self, case_id: int, status: str = "scraped"):
         """ Update status of case input row
 
         Args:
             row (int): row number
             status (str): status
         """
-        pass
+        
+        print(f"Updating status to '{status}'...")
+        
+        # Move to input sheet
+        self.set_sheet(self.sheet_input)
+        
+        # Calculate row and write status
+        cases_ids = [row["Case Number"] for row in self.input_data]
+        row = cases_ids.index(case_id) + 2
+        self.write_cell(status, row=row, column=6)
 
     
