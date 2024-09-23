@@ -42,16 +42,17 @@ def main():
         case_data = scraper.get_case_data(case_number, case_date)
         
         # Catch no data
-        if not case_data:
+        status = "scraped"
+        if case_data:
+            # Save case data in output sheet
+            data_manager.write_output_row(case_data, case_number, case_date)
+        else:
+            status = "no data"
             print(f"No data found for case '{case_number}'.")
-            continue
-
-        # Save case data in output sheet
-        data_manager.write_output_row(case_data, case_number, case_date)
 
         # Update status in input sheet
-        data_manager.update_input_status(case_number)
-        print(f"Case '{case_number}' has been scraped.")
+        data_manager.update_input_status(case_number, status=status)
+        print(f"Case '{case_number}' done.")
 
     print("All cases have been scraped.")
 

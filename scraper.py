@@ -168,13 +168,19 @@ class Scraper(WebScraping):
         
         print(f"Searching case '{case_id}'...")
         
+        # Move to new tab
+        self.open_tab()
+        self.switch_to_tab(0)
+        self.close_tab()
+        self.switch_to_tab(0)
+        
         # Load research page
         search_page = f"{self.home_page}/search?q={case_id}"
         self.set_page(search_page)
         sleep(2)
         
         # Wait to load results
-        self.wait_die(selectors["loading"], 20)
+        self.wait_die(selectors["loading"], 60)
         self.delete_comments_js()
         self.refresh_selenium()
         
@@ -211,7 +217,7 @@ class Scraper(WebScraping):
         
         # Wait to fetch case data
         for _ in range(2):
-            self.wait_die(self.global_selectors["spinner"], 20)
+            self.wait_die(self.global_selectors["spinner"], 60)
     
     def __save_parties__(self):
         """ Load and save parties data of the current case """
@@ -269,7 +275,7 @@ class Scraper(WebScraping):
         while True:
             
             # Wait to load
-            self.wait_die(self.global_selectors["spinner"], 20)
+            self.wait_die(self.global_selectors["spinner"], 60)
             sleep(2)
             self.refresh_selenium()
             
