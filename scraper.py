@@ -25,9 +25,7 @@ class Scraper(WebScraping):
         print("Starting scraper...")
         
         super().__init__(
-            auto_chrome_folder_windows=True,
             headless=headless,
-            start_killing=True,
         )
         
         # Global data
@@ -40,14 +38,8 @@ class Scraper(WebScraping):
         self.parties = []
         self.user_email = user_email
         self.user_password = user_password
-        
-        # Create empty cookies file if it does not exist
-        if not os.path.exists(cookies_path):
-            with open(cookies_path, "wb") as file:
-                pickle.dump([], file)
                 
         # Setup
-        self.__set_home_page__()
         self.__load_cookies__()
         self.__login__()
         self.__accept_close_session__()
@@ -62,6 +54,9 @@ class Scraper(WebScraping):
     
     def __load_cookies__(self):
         """ Load cookies from local file """
+        
+        if not os.path.exists(cookies_path):
+            return
         
         with open(cookies_path, "rb") as file:
             cookies = pickle.load(file)
