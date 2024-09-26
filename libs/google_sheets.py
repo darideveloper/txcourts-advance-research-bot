@@ -42,7 +42,15 @@ class SheetsManager ():
     def write_cell(self, value, row=1, column=1):
         """ Write data in specific cell
         """
-        self.worksheet.update_cell(row, column, value)
+        
+        for _ in range(3):
+            try:
+                self.worksheet.update_cell(row, column, value)
+            except Exception:
+                print("\tError writing cell. Retrying in 1 minute seconds...")
+                sleep(60)
+            else:
+                break
 
     def write_data(self, data, row=1, column=1):
         """ Write list of data in the worksheet"""
@@ -62,7 +70,7 @@ class SheetsManager ():
                 for cell in row_data:
                     self.write_cell(cell, row_index, column_index)
                     column_index += 1
-                    sleep(1)
+                    sleep(2)
 
     def get_data(self):
         """ Read all records of the sheet"""
