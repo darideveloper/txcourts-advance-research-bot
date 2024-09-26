@@ -65,7 +65,9 @@ class DataManager(SheetsManager):
             case_data["case_status"] = ""
         
         # Fill filings with empty strings
-        if len(case_data["filings"]) < 3:
+        if len(case_data["filings"]) > 3:
+            case_data["filings"] = case_data["filings"][0:3]
+        else:
             case_data["filings"] += [""] * (3 - len(case_data["filings"]))
             
         # Bool values to string
