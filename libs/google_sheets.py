@@ -1,6 +1,6 @@
-#! python3
-# Conect to google spreadsheets
 import os
+from time import sleep
+
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
@@ -62,6 +62,7 @@ class SheetsManager ():
                 for cell in row_data:
                     self.write_cell(cell, row_index, column_index)
                     column_index += 1
+                    sleep(1)
 
     def get_data(self):
         """ Read all records of the sheet"""
