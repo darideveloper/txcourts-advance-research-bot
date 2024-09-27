@@ -1,4 +1,6 @@
 import os
+from time import sleep
+
 from dotenv import load_dotenv
 
 from scraper import Scraper
@@ -11,6 +13,7 @@ SHEET_INPUT = os.getenv("SHEET_INPUT")
 SHEET_OUTPUT = os.getenv("SHEET_OUTPUT")
 USER_EMAIL = os.getenv("USER_EMAIL")
 USER_PASSWORD = os.getenv("USER_PASSWORD")
+WAIT_MINUTES = int(os.getenv("WAIT_MINUTES"))
 
 # Paths
 current_path = os.path.dirname(os.path.abspath(__file__))
@@ -53,6 +56,10 @@ def main():
         # Update status in input sheet
         data_manager.update_input_status(case_number, status=status)
         print(f"Case '{case_number}' done.")
+        
+        # Wait time
+        print(f"Waiting {WAIT_MINUTES} minutes...")
+        sleep(WAIT_MINUTES * 60)
 
     print("All cases have been scraped.")
 
