@@ -54,48 +54,53 @@ class DataManager(SheetsManager):
                 is_sale (bool): is sale
                 case_status (str): case status
                 attorneys (list): list of attorneys
+            case_id (str): case id
+            case_date (str): case date
         """
         
         print("Writing output data in output sheet...")
         
-        # Fix data
-        
-        # None to empty string
-        if case_data["case_status"] is None:
-            case_data["case_status"] = ""
-        
-        # Fill filings with empty strings
-        if len(case_data["filings"]) > 3:
-            case_data["filings"] = case_data["filings"][0:3]
-        else:
-            case_data["filings"] += [""] * (3 - len(case_data["filings"]))
-            
-        # Bool values to string
-        bool_columns = ["is_judgment", "is_trial", "is_sale"]
-        for column in bool_columns:
-            if case_data[column]:
-                case_data[column] = "Yes"
-            else:
-                case_data[column] = "No"
-            
-        # Create row data: case_id, case_date, defendants, num_defendants,
-        # filing_1, filing_2, filing_3, is_judgment, is_trial, is_sale, case_status,
-        # attorneys
+        # Initial data
         row_data = []
         row_data.append(case_id)
         row_data.append(case_date)
-        row_data.append("\n".join(case_data["defendants"]))
-        row_data.append(len(case_data["defendants"]))
-        row_data += case_data["filings"]
-        row_data.append(case_data["is_judgment"])
-        row_data.append(case_data["is_trial"])
-        row_data.append(case_data["is_sale"])
-        row_data.append(case_data["case_status"])
-        row_data.append("\n".join(case_data["attorneys"]))
         
-        # Move to output sheet
-        self.set_sheet(self.sheet_output)
+        # Fix data
+        if case_data:
         
+            # None to empty string
+            if case_data["case_status"] is None:
+                case_data["case_status"] = ""
+            
+            # Fill filings with empty strings
+            if len(case_data["filings"]) > 3:
+                case_data["filings"] = case_data["filings"][0:3]
+            else:
+                case_data["filings"] += [""] * (3 - len(case_data["filings"]))
+                
+            # Bool values to string
+            bool_columns = ["is_judgment", "is_trial", "is_sale"]
+            for column in bool_columns:
+                if case_data[column]:
+                    case_data[column] = "Yes"
+                else:
+                    case_data[column] = "No"
+                
+            # Create row data: case_id, case_date, defendants, num_defendants,
+            # filing_1, filing_2, filing_3, is_judgment, is_trial, is_sale, case_status,
+            # attorneys
+            row_data.append("\n".join(case_data["defendants"]))
+            row_data.append(len(case_data["defendants"]))
+            row_data += case_data["filings"]
+            row_data.append(case_data["is_judgment"])
+            row_data.append(case_data["is_trial"])
+            row_data.append(case_data["is_sale"])
+            row_data.append(case_data["case_status"])
+            row_data.append("\n".join(case_data["attorneys"]))
+            
+            # Move to output sheet
+            self.set_sheet(self.sheet_output)
+            
         # Write row in output sheet
         last_row = self.get_rows_num()
         self.write_data([row_data], row=last_row + 1)

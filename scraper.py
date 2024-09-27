@@ -391,6 +391,23 @@ class Scraper(WebScraping):
         return self.get_text(selectors["status"])
     
     def get_case_data(self, case_id: str, date: str) -> dict:
+        """ Get case data from the website.
+
+        Args:
+            case_id (str): case identifier
+            date (str): case date (to filter if there are multiple cases)
+
+        Returns:
+            dict: case data
+                defendants (list): list of defendants
+                filings (list): list of filings
+                is_judgment (bool): True if there is a judgment event
+                is_trial (bool): True if there is a trial event
+                is_sale (bool): True if there is a sale event
+                case_status (str): case status
+                defendants (list): list of defendants
+                attorneys (list): list of attorneys
+        """
         
         # Search case
         case_link = self.__search_case__(case_id, date)

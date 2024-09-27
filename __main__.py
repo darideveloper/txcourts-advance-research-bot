@@ -52,6 +52,9 @@ def main():
         else:
             status = "no data"
             print(f"No data found for case '{case_number}'.")
+            
+            # Save only case number and date
+            data_manager.write_output_row({}, case_number, case_date)
 
         # Update status in input sheet
         data_manager.update_input_status(case_number, status=status)
