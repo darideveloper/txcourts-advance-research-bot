@@ -42,11 +42,27 @@ def main():
         case_number = case_data["Case Number"]
         case_date = case_data["Case Filed Date"]
         print("\n------------------")
-        case_data = scraper.get_case_data(case_number, case_date)
+        
+        try:
+            case_data = scraper.get_case_data(case_number, case_date)
+        except Exception as e:
+            print("Error scraping case. Check logs for more info.")
+            
+            # Save error log
+            error_log_path = os.path.join(current_path, "error.txt")
+            with open(error_log_path, "w") as f:
+                f.write(f"Error scraping case '{case_number}': {e}\n")
+                
+            # Save chrome screenshot
+            screenshot_path = os.path.join(current_path, "error.png")
+            scraper.screenshot(screenshot_path)
+            
+            case_data = None
         
         # Catch no data
-        status = "scraped"
         if case_data:
+            status = "scraped"
+            
             # Save case data in output sheet
             data_manager.write_output_row(case_data, case_number, case_date)
         else:

@@ -98,8 +98,8 @@ class DataManager(SheetsManager):
             row_data.append(case_data["case_status"])
             row_data.append("\n".join(case_data["attorneys"]))
             
-            # Move to output sheet
-            self.set_sheet(self.sheet_output)
+        # Move to output sheet
+        self.set_sheet(self.sheet_output)
             
         # Write row in output sheet
         last_row = self.get_rows_num()
