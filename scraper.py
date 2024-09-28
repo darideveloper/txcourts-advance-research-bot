@@ -170,7 +170,7 @@ class Scraper(WebScraping):
         self.switch_to_tab(0)
         
         # Load research page
-        search_page = f"{self.home_page}/search?q={case_id}"
+        search_page = f'{self.home_page}/search?q=%22{case_id}%22'
         self.set_page(search_page)
         sleep(2)
         
