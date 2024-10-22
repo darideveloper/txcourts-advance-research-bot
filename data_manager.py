@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from libs.google_sheets import SheetsManager
 
 
@@ -64,11 +65,13 @@ class DataManager(SheetsManager):
         print("Writing output data in output sheet...")
         
         # Initial data
+        run_date = datetime.now().strftime("%d/%m/%Y")
         row_data = [
             case_description,
             case_id,
             case_location,
-            case_date
+            case_date,
+            run_date,
         ]
         
         # Fix data
@@ -95,8 +98,8 @@ class DataManager(SheetsManager):
             # Create row data: case_id, case_date, defendants, num_defendants,
             # filing_1, filing_2, filing_3, is_judgment, is_trial, is_sale, case_status,
             # attorneys
-            row_data.append("\n".join(case_data["defendants"]))
             row_data.append(len(case_data["defendants"]))
+            row_data.append("\n".join(case_data["defendants"]))
             row_data += case_data["filings"]
             row_data.append(case_data["is_judgment"])
             row_data.append(case_data["is_trial"])

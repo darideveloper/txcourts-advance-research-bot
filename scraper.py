@@ -208,11 +208,13 @@ class Scraper(WebScraping):
         
         # Open case page
         self.set_page(case_link)
-        self.refresh_selenium()
         
         # Wait to fetch case data
-        for _ in range(2):
+        for _ in range(5):
+            self.refresh_selenium()
             self.wait_die(self.global_selectors["spinner"], 60)
+        sleep(5)
+        self.refresh_selenium()
     
     def __save_parties__(self):
         """ Load and save parties data of the current case """
@@ -270,8 +272,9 @@ class Scraper(WebScraping):
         while True:
             
             # Wait to load
-            self.wait_die(self.global_selectors["spinner"], 60)
-            sleep(2)
+            for _ in range(6):
+                self.wait_die(self.global_selectors["spinner"], 60)
+                sleep(1)
             self.refresh_selenium()
             
             # Loop events to get data
