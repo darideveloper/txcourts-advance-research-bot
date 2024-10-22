@@ -41,6 +41,9 @@ def main():
 
         case_number = case_data["Case Number"]
         case_date = case_data["Case Filed Date"]
+        case_description = case_data["Case Description"]
+        case_location = case_data["Case Location"]
+        
         print("\n------------------")
         
         try:
@@ -64,13 +67,15 @@ def main():
             status = "scraped"
             
             # Save case data in output sheet
-            data_manager.write_output_row(case_data, case_number, case_date)
+            data_manager.write_output_row(case_data, case_number, case_date,
+                                          case_description, case_location)
         else:
             status = "no data"
             print(f"No data found for case '{case_number}'.")
             
             # Save only case number and date
-            data_manager.write_output_row({}, case_number, case_date)
+            data_manager.write_output_row({}, case_number, case_date,
+                                          case_description, case_location)
 
         # Update status in input sheet
         data_manager.update_input_status(case_number, status=status)

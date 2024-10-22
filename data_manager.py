@@ -42,7 +42,8 @@ class DataManager(SheetsManager):
         # Filter only ready registers and required columns
         return data_ready
     
-    def write_output_row(self, case_data: dict, case_id: str, case_date: str):
+    def write_output_row(self, case_data: dict, case_id: str, case_date: str,
+                         case_description: str, case_location: str):
         """ Write case row in output sheet
 
         Args:
@@ -56,14 +57,19 @@ class DataManager(SheetsManager):
                 attorneys (list): list of attorneys
             case_id (str): case id
             case_date (str): case date
+            case_description (str): case description
+            case_location (str): case location
         """
         
         print("Writing output data in output sheet...")
         
         # Initial data
-        row_data = []
-        row_data.append(case_id)
-        row_data.append(case_date)
+        row_data = [
+            case_description,
+            case_id,
+            case_location,
+            case_date
+        ]
         
         # Fix data
         if case_data:
