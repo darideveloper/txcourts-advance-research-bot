@@ -65,12 +65,9 @@ class SheetsManager ():
 
                 # Set the position of the next row. Omit the header
                 row_index = data.index(row_data) + row
-
-                column_index = column
-                for cell in row_data:
-                    self.write_cell(cell, row_index, column_index)
-                    column_index += 1
-                    sleep(2)
+                
+                cell_range = self.get_range(row_index, column, len(row_data))
+                self.worksheet.update(cell_range, data)
 
     def get_data(self):
         """ Read all records of the sheet"""
@@ -92,3 +89,19 @@ class SheetsManager ():
         """ Delete a row of the sheet """
 
         self.worksheet.delete_row(row)
+
+    def get_range(self, row, start_col, end_col) -> str:
+        """ Return the range of the cells
+        
+        Args:
+            row (int): row number
+            start_col (int): start column number
+            end_col (int): end column number
+            
+        Returns:
+            str: range of the cells
+        """
+        
+        start_cell = gspread.utils.rowcol_to_a1(row, start_col)
+        end_cell = gspread.utils.rowcol_to_a1(row, end_col)
+        return f"{start_cell}:{end_cell}"
