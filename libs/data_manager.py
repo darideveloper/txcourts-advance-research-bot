@@ -80,12 +80,6 @@ class DataManager(SheetsManager):
             # None to empty string
             if case_data["case_status"] is None:
                 case_data["case_status"] = ""
-            
-            # Fill filings with empty strings
-            if len(case_data["filings"]) > 3:
-                case_data["filings"] = case_data["filings"][0:3]
-            else:
-                case_data["filings"] += [""] * (3 - len(case_data["filings"]))
                 
             # Bool values to string
             bool_columns = ["is_judgment", "is_trial", "is_sale"]
@@ -100,7 +94,7 @@ class DataManager(SheetsManager):
             # attorneys
             row_data.append(len(case_data["defendants"]))
             row_data.append("\n".join(case_data["defendants"]))
-            row_data += case_data["filings"]
+            row_data.append("\n".join(case_data["filings"]))
             row_data.append(case_data["is_judgment"])
             row_data.append(case_data["is_trial"])
             row_data.append(case_data["is_sale"])
