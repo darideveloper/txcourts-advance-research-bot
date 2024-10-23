@@ -261,6 +261,7 @@ class Scraper(WebScraping):
             "comment": 'td:nth-child(4)',
             "btn_next": '.page-item:not(.disabled) '
                         '[ng-click="selectPage(page + 1, $event)"]',
+            "documents": '.documentsCell',
         }
         
         print("Getting events data...")
@@ -281,22 +282,24 @@ class Scraper(WebScraping):
             events_num = len(self.get_elems(selectors["events"]))
             for event_num in range(1, events_num + 1):
                 event_selector = f"{selectors['events']}:nth-child({event_num})"
-                event_date_str = self.get_text(f"{event_selector} {selectors['data']}")
-                event_type = self.get_text(f"{event_selector} {selectors['type']}")
-                event_comment = self.get_text(f"{event_selector} {selectors['comment']}")
+                date_str = self.get_text(f"{event_selector} {selectors['data']}")
+                type = self.get_text(f"{event_selector} {selectors['type']}")
+                comment = self.get_text(f"{event_selector} {selectors['comment']}")
+                documents = self.get_text(f"{event_selector} {selectors['documents']}")
                 
                 # Skip if the filing is empty
-                if not event_type:
+                if not type:
                     continue
                 
                 # Convert date to datetime in
                 # format 11/21/2018
-                event_date = datetime.strptime(event_date_str, "%m/%d/%Y")
+                date = datetime.strptime(date_str, "%m/%d/%Y")
                 
                 events.append({
-                    "type": event_type,
-                    "comment": event_comment,
-                    "date": event_date,
+                    "type": type,
+                    "comment": comment,
+                    "date": date,
+                    "documents": documents,
                 })
                 
             # Go next page
@@ -344,12 +347,27 @@ class Scraper(WebScraping):
             list[str]: list of filings/events names for the case
         """
         
+        def get_event_str(event_data: dict) -> str:
+            """ Return event as string in format "date - type---comment---documents",
+
+            Args:
+                event_data (dict): event data
+
+            Returns:
+                str: event as string
+            """
+            
+            documents = event_data["documents"].replace("\n", ", ")
+            event_str = f"{event_data['date']} - {event_data['type']}"
+            event_str += f"---{event_data['comment']}---{documents}"
+            return event_str
+        
         print("\tGetting filings...")
         
         # Get type and comments from last 3 events
         events_reverse = self.events[::-1]
         filings = list(map(
-            lambda event: f"{event['type']}-----{event['comment']}",
+            lambda event: get_event_str(event),
             events_reverse
         ))
         

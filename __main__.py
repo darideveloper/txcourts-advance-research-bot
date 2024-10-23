@@ -3,8 +3,8 @@ from time import sleep
 
 from dotenv import load_dotenv
 
-from scraper import Scraper
-from data_manager import DataManager
+from libs.scraper import Scraper
+from libs.data_manager import DataManager
 
 # Env variables
 load_dotenv()
