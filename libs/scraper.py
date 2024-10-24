@@ -210,7 +210,7 @@ class Scraper(WebScraping):
         self.set_page(case_link)
         
         # Wait to fetch case data
-        for _ in range(5):
+        for _ in range(3):
             self.refresh_selenium()
             self.wait_die(self.global_selectors["spinner"], 60)
         sleep(5)
@@ -273,7 +273,7 @@ class Scraper(WebScraping):
         while True:
             
             # Wait to load
-            for _ in range(6):
+            for _ in range(3):
                 self.wait_die(self.global_selectors["spinner"], 60)
                 sleep(1)
             self.refresh_selenium()
@@ -357,8 +357,9 @@ class Scraper(WebScraping):
                 str: event as string
             """
             
+            date_str = event_data["date"].strftime("%Y-%m-%d")
             documents = event_data["documents"].replace("\n", ", ")
-            event_str = f"{event_data['date']} - {event_data['type']}"
+            event_str = f"{date_str} - {event_data['type']}"
             event_str += f"---{event_data['comment']}---{documents}"
             return event_str
         
