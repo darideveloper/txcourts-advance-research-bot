@@ -452,12 +452,18 @@ class Scraper(WebScraping):
         is_trial = self.__get_in_events__("trial")
         is_sale = self.__get_in_events__("sale")
         is_foreclosure = self.__get_in_events__("foreclosure")
+        is_ad_litem = self.__get_in_events__("ad litem")
+        is_ad__litem = self.__get_in_events__("ad-litem")
+        is_litem = self.__get_in_events__("litem")
         case_status = self.__get_case_status__()
         
         nonsult_dismissal = is_nonsuit or is_non_suit or is_non__suit or \
             is_dismissal or is_dismiss
         judgment_trial_sale_foreclosure = is_judgment or is_trial or \
             is_sale or is_foreclosure
+        ad_litem = is_ad_litem or is_ad__litem or is_litem
+        if ad_litem:
+            print(ad_litem)
         
         # Return case data
         return {
@@ -467,4 +473,5 @@ class Scraper(WebScraping):
             "judgment_trial_sale_foreclosure": judgment_trial_sale_foreclosure,
             "case_status": case_status,
             "attorneys": attorneys,
+            "ad_litem": ad_litem,
         }
