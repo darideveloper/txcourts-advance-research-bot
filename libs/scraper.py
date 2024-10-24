@@ -49,7 +49,7 @@ class Scraper(WebScraping):
         """ Load home page and refresh """
         
         self.set_page(self.home_page)
-        sleep(2)
+        sleep(4)
         self.refresh_selenium()
     
     def __load_cookies__(self):
@@ -384,7 +384,7 @@ class Scraper(WebScraping):
             bool: True if there is a match, False otherwise
         """
         
-        print(f"\tChecking if there is a '{keyword}' events...")
+        print(f"\tChecking if there is a '{keyword}' in events...")
         
         comments = list(map(lambda event: event["comment"], self.events))
         types = list(map(lambda event: event["type"], self.events))
@@ -462,8 +462,6 @@ class Scraper(WebScraping):
         judgment_trial_sale_foreclosure = is_judgment or is_trial or \
             is_sale or is_foreclosure
         ad_litem = is_ad_litem or is_ad__litem or is_litem
-        if ad_litem:
-            print(ad_litem)
         
         # Return case data
         return {
