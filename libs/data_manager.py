@@ -82,7 +82,7 @@ class DataManager(SheetsManager):
                 case_data["case_status"] = ""
                 
             # Bool values to string
-            bool_columns = ["is_judgment", "is_trial", "is_sale"]
+            bool_columns = ["nonsult_dismissal", "judgment_trial_sale_foreclosure"]
             for column in bool_columns:
                 if case_data[column]:
                     case_data[column] = "Yes"
@@ -90,15 +90,13 @@ class DataManager(SheetsManager):
                     case_data[column] = "No"
                 
             # Create row data: case_id, case_date, defendants, num_defendants,
-            # filing_1, filing_2, filing_3, is_judgment, is_trial, is_sale, case_status,
-            # attorneys
-            row_data.append(len(case_data["defendants"]))
             row_data.append("\n".join(case_data["defendants"]))
+            row_data.append(len(case_data["defendants"]))
             row_data.append("\n".join(case_data["filings"]))
-            row_data.append(case_data["is_judgment"])
-            row_data.append(case_data["is_trial"])
-            row_data.append(case_data["is_sale"])
+            row_data.append(case_data["nonsult_dismissal"])
+            row_data.append(case_data["judgment_trial_sale_foreclosure"])
             row_data.append(case_data["case_status"])
+            row_data.append("Ad Litem")
             row_data.append("\n".join(case_data["attorneys"]))
             
         # Move to output sheet

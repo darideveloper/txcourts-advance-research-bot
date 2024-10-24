@@ -443,19 +443,28 @@ class Scraper(WebScraping):
         self.__save_events__()
         defendants, attorneys = self.__get_defendants_attorneys__()
         filings = self.__get_filings__()
+        is_nonsuit = self.__get_in_events__("nonsuit")
+        is_non_suit = self.__get_in_events__("non-suit")
+        is_non__suit = self.__get_in_events__("non_suit")
+        is_dismissal = self.__get_in_events__("dismissal")
+        is_dismiss = self.__get_in_events__("dismiss")
         is_judgment = self.__get_in_events__("judgment")
         is_trial = self.__get_in_events__("trial")
         is_sale = self.__get_in_events__("sale")
+        is_foreclosure = self.__get_in_events__("foreclosure")
         case_status = self.__get_case_status__()
+        
+        nonsult_dismissal = is_nonsuit or is_non_suit or is_non__suit or \
+            is_dismissal or is_dismiss
+        judgment_trial_sale_foreclosure = is_judgment or is_trial or \
+            is_sale or is_foreclosure
         
         # Return case data
         return {
             "defendants": defendants,
             "filings": filings,
-            "is_judgment": is_judgment,
-            "is_trial": is_trial,
-            "is_sale": is_sale,
+            "nonsult_dismissal": nonsult_dismissal,
+            "judgment_trial_sale_foreclosure": judgment_trial_sale_foreclosure,
             "case_status": case_status,
-            "defendants": defendants,
             "attorneys": attorneys,
         }
