@@ -11,6 +11,17 @@ current_path = os.path.dirname(os.path.abspath(__file__))
 cookies_path = os.path.join(current_path, "cookies.pkl")
 
 
+def save_screnshot(func):
+    def wrapper(self, *args, **kwargs):
+        # Take a screenshot of current chrome window
+        self.screenshot("screenshot.png")
+        
+        result = func(self, *args, **kwargs)
+        
+        return result
+    return wrapper
+
+
 class Scraper(WebScraping):
     
     def __init__(self, user_email: str, user_password: str, headless: bool = False):
@@ -44,7 +55,8 @@ class Scraper(WebScraping):
         self.__login__()
         self.__accept_close_session__()
         sleep(3)
-        
+    
+    @save_screnshot
     def __set_home_page__(self):
         """ Load home page and refresh """
         
@@ -52,6 +64,7 @@ class Scraper(WebScraping):
         sleep(4)
         self.refresh_selenium()
     
+    @save_screnshot
     def __load_cookies__(self):
         """ Load cookies from local file """
         
@@ -64,6 +77,7 @@ class Scraper(WebScraping):
         self.driver.refresh()
         self.refresh_selenium()
     
+    @save_screnshot
     def __validate_login__(self) -> bool:
         """ Validate if user is logged in
         
@@ -80,6 +94,7 @@ class Scraper(WebScraping):
             return False
         return True
     
+    @save_screnshot
     def __login__(self):
         """ Login with user credentials """
         
@@ -128,6 +143,7 @@ class Scraper(WebScraping):
         with open(cookies_path, "wb") as file:
             pickle.dump(cookies, file)
     
+    @save_screnshot
     def __accept_close_session__(self):
         """ Accept message for closing session (if exists) """
         
@@ -142,6 +158,7 @@ class Scraper(WebScraping):
             self.click(selectors["btn_close"])
             self.refresh_selenium()
     
+    @save_screnshot
     def __search_case__(self, case_id: str, date: str) -> bool:
         """ Search case in the website.
 
@@ -197,6 +214,7 @@ class Scraper(WebScraping):
         # End when the case is found
         return case_link
     
+    @save_screnshot
     def __load_case_page__(self, case_link: str) -> bool:
         """ Load case page and wait to load.
         
@@ -216,6 +234,7 @@ class Scraper(WebScraping):
         sleep(5)
         self.refresh_selenium()
     
+    @save_screnshot
     def __save_parties__(self):
         """ Load and save parties data of the current case """
         
@@ -250,6 +269,7 @@ class Scraper(WebScraping):
                 
         self.parties = parties
     
+    @save_screnshot
     def __save_events__(self):
         """ Load and save events data of the current case """
         
@@ -311,6 +331,7 @@ class Scraper(WebScraping):
             
         self.events = events
     
+    @save_screnshot
     def __get_defendants_attorneys__(self) -> tuple[list, list]:
         """ Get defendants of the case from parties daya
 
@@ -340,6 +361,7 @@ class Scraper(WebScraping):
                 
         return defendants_names, defendants_attorneys
     
+    @save_screnshot
     def __get_filings__(self) -> list[str]:
         """ Get last three filings/events of the case.
         
@@ -374,6 +396,7 @@ class Scraper(WebScraping):
         
         return filings
     
+    @save_screnshot
     def __get_in_events__(self, keyword: str) -> bool:
         """ Validate if specific keyword is in types or event comments
         
@@ -392,6 +415,7 @@ class Scraper(WebScraping):
         in_types = any(keyword in type.lower() for type in types)
         return in_comments or in_types
     
+    @save_screnshot
     def __get_case_status__(self) -> str:
         """ Return case status.
 
@@ -412,6 +436,7 @@ class Scraper(WebScraping):
         
         return self.get_text(selectors["status"])
     
+    @save_screnshot
     def get_case_data(self, case_id: str, date: str) -> dict:
         """ Get case data from the website.
 

@@ -14,6 +14,7 @@ SHEET_OUTPUT = os.getenv("SHEET_OUTPUT")
 USER_EMAIL = os.getenv("USER_EMAIL")
 USER_PASSWORD = os.getenv("USER_PASSWORD")
 WAIT_MINUTES = int(os.getenv("WAIT_MINUTES"))
+SHOW_BROWSER = os.getenv("SHOW_BROWSER") == "True"
 
 # Paths
 current_path = os.path.dirname(os.path.abspath(__file__))
@@ -34,7 +35,7 @@ def main():
     input_data = data_manager.get_input_data()
 
     # Start scraper
-    scraper = Scraper(USER_EMAIL, USER_PASSWORD)
+    scraper = Scraper(USER_EMAIL, USER_PASSWORD, not SHOW_BROWSER)
 
     # Scrape each case
     for case_data in input_data:
