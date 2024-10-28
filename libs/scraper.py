@@ -333,11 +333,14 @@ class Scraper(WebScraping):
         self.events = events
     
     @save_screnshot
-    def __get_defendants_attorneys__(self) -> tuple[list, list]:
+    def __get_attorneys__(self) -> tuple[list, list, list]:
         """ Get defendants of the case from parties daya
 
         Returns:
-            list: list of defendants (usually two)
+            tuple[list, list, list]:
+                defendants names (list),
+                defendants attorneys (list),
+                plaintiffs attorneys (list)
         """
         
         print("\tGetting defendants attorneys...")
@@ -355,12 +358,21 @@ class Scraper(WebScraping):
             lambda party: party["attorney"],
             defendants_rows
         ))
+        plaintiffs_rows = list(filter(
+            lambda party: "plaintiff" in party["type"].lower(),
+            self.parties
+        ))
+        plaintiffs_attorneys = list(map(
+            lambda party: party["attorney"],
+            plaintiffs_rows
+        ))
         
         # Remove duplicates
         defendants_names = list(set(defendants_names))
         defendants_attorneys = list(set(defendants_attorneys))
+        plaintiffs_attorneys = list(set(plaintiffs_attorneys))
                 
-        return defendants_names, defendants_attorneys
+        return defendants_names, defendants_attorneys, plaintiffs_attorneys
     
     @save_screnshot
     def __get_filings__(self) -> list[str]:
@@ -447,14 +459,14 @@ class Scraper(WebScraping):
 
         Returns:
             dict: case data
-                defendants (list): list of defendants
                 filings (list): list of filings
                 is_judgment (bool): True if there is a judgment event
                 is_trial (bool): True if there is a trial event
                 is_sale (bool): True if there is a sale event
                 case_status (str): case status
                 defendants (list): list of defendants
-                attorneys (list): list of attorneys
+                defendants_attorneys (list): list of defendants attorneys
+                plaintiffs_attorneys (list): list of plaintiffs
         """
         
         # Search case
@@ -467,7 +479,7 @@ class Scraper(WebScraping):
         # Get case data
         self.__save_parties__()
         self.__save_events__()
-        defendants, attorneys = self.__get_defendants_attorneys__()
+        defendants, defendants_attorneys, plaintiffs_attorneys = self.__get_attorneys__()
         filings = self.__get_filings__()
         is_nonsuit = self.__get_in_events__("nonsuit")
         is_non_suit = self.__get_in_events__("non-suit")
@@ -491,11 +503,12 @@ class Scraper(WebScraping):
         
         # Return case data
         return {
-            "defendants": defendants,
             "filings": filings,
             "nonsult_dismissal": nonsult_dismissal,
             "judgment_trial_sale_foreclosure": judgment_trial_sale_foreclosure,
             "case_status": case_status,
-            "attorneys": attorneys,
             "ad_litem": ad_litem,
+            "defendants": defendants,
+            "defendants_attorneys": defendants_attorneys,
+            "plaintiffs_attorneys": plaintiffs_attorneys,
         }

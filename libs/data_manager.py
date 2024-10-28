@@ -101,7 +101,8 @@ class DataManager(SheetsManager):
             row_data.append(case_data["judgment_trial_sale_foreclosure"])
             row_data.append(case_data["ad_litem"])
             row_data.append(case_data["case_status"])
-            row_data.append("\n".join(case_data["attorneys"]))
+            row_data.append("\n".join(case_data["defendants_attorneys"]))
+            row_data.append("\n".join(case_data["plaintiffs_attorneys"]))
             
         # Move to output sheet
         self.set_sheet(self.sheet_output)
