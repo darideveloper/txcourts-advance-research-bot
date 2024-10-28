@@ -91,7 +91,7 @@ class DataManager(SheetsManager):
                 if case_data[column]:
                     case_data[column] = "Yes"
                 else:
-                    case_data[column] = ""
+                    case_data[column] = "No"
                 
             # Create row data: case_id, case_date, defendants, num_defendants,
             row_data.append("\n".join(case_data["defendants"]))
