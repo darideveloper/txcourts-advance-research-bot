@@ -65,7 +65,7 @@ class DataManager(SheetsManager):
         print("Writing output data in output sheet...")
         
         # Initial data
-        run_date = datetime.now().strftime("%d/%m/%Y")
+        run_date = datetime.now().strftime("%m/%d/%Y")
         row_data = [
             case_description,
             case_id,
@@ -91,7 +91,7 @@ class DataManager(SheetsManager):
                 if case_data[column]:
                     case_data[column] = "Yes"
                 else:
-                    case_data[column] = "No"
+                    case_data[column] = ""
                 
             # Create row data: case_id, case_date, defendants, num_defendants,
             row_data.append("\n".join(case_data["defendants"]))
