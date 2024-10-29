@@ -37,7 +37,6 @@ class Scraper(WebScraping):
         
         super().__init__(
             headless=headless,
-            start_killing=True,
         )
         
         # Global data
