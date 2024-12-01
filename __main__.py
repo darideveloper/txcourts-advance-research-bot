@@ -3,7 +3,7 @@ from time import sleep
 
 from dotenv import load_dotenv
 
-from libs.scraper import Scraper
+from libs.scraper_extractor import Scraper
 # from libs.data_manager import DataManager
 
 # Env variables
@@ -35,6 +35,11 @@ def main():
 
     # Start scraper
     scraper = Scraper(USER_EMAIL, USER_PASSWORD, not SHOW_BROWSER)
+    scraper.login()
+    scraper.open_advanced_search()
+    
+    # Filter cases
+    scraper.filter(START_DATE, END_DATE)
         
     print(f"Waiting {WAIT_MINUTES} minutes...")
     sleep(WAIT_MINUTES * 60)
