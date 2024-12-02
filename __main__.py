@@ -12,10 +12,10 @@ GOOGLE_SHEET_LINK = os.getenv("GOOGLE_SHEET_LINK")
 SHEET_OUTPUT = os.getenv("SHEET_OUTPUT")
 USER_EMAIL = os.getenv("USER_EMAIL")
 USER_PASSWORD = os.getenv("USER_PASSWORD")
-WAIT_MINUTES = int(os.getenv("WAIT_MINUTES"))
 SHOW_BROWSER = os.getenv("SHOW_BROWSER") == "True"
 START_DATE = os.getenv("START_DATE")
 END_DATE = os.getenv("END_DATE")
+DEBUG = os.getenv("DEBUG") == "True"
 
 # Paths
 current_path = os.path.dirname(os.path.abspath(__file__))
@@ -28,21 +28,33 @@ def main():
 
     # Header
     print("\n----------------------------------")
-    print("TXCourts Research Bot")
+    print("TXCourts (Advance) Research Bot")
     print("----------------------------------\n")
 
     # data_manager = DataManager(GOOGLE_SHEET_LINK, creds_path, SHEET_OUTPUT)
 
     # Start scraper
-    scraper = Scraper(USER_EMAIL, USER_PASSWORD, not SHOW_BROWSER)
+    scraper = Scraper(USER_EMAIL, USER_PASSWORD, not SHOW_BROWSER, debug=DEBUG)
     scraper.login()
     scraper.open_advanced_search()
     
-    # Filter cases
+    # Filter cases and submit search
     scraper.filter(START_DATE, END_DATE)
+    scraper.submit()
+    
+    # Get cases data and save to excel
+    while True:
         
-    print(f"Waiting {WAIT_MINUTES} minutes...")
-    sleep(WAIT_MINUTES * 60)
+        # Get cases data
+        cases_data = scraper.get_current_cases_data()
+        
+        # TODO: Save data to excel
+        
+        # Go to the next
+        has_next_page = scraper.go_next_page()
+        if not has_next_page:
+            print("No more pages to scrape.")
+            break
 
 
 if __name__ == "__main__":

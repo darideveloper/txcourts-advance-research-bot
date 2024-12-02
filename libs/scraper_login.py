@@ -74,7 +74,7 @@ class ScraperLogin(WebScraping):
             bool: True if the user is logged in, False otherwise
         """
 
-        print("Validating login...")
+        print("\tValidating login...")
 
         self.__set_home_page__()
 
@@ -91,7 +91,7 @@ class ScraperLogin(WebScraping):
             "btn_close": '[ng-click="endOtherSessions()"]'
         }
 
-        print("Looking for close session message")
+        print("\tLooking for close session message")
 
         btn_close_elem = self.get_elems(selectors["btn_close"])
         if btn_close_elem:
@@ -112,12 +112,12 @@ class ScraperLogin(WebScraping):
 
         # sKip if the user is already logged in
         if is_logged:
-            print("User is already logged in")
+            print("\tUser is already logged in")
             return
 
         # Login if the user is not logged in
-        print("User is not logged in")
-        print(f"Login with email '{self.user_email}'...")
+        print("\tUser is not logged in")
+        print(f"\tLogin with email '{self.user_email}'...")
 
         # Go to login page
         self.click_js(self.global_selectors["btn_login"])
@@ -138,7 +138,7 @@ class ScraperLogin(WebScraping):
         # Validate login (again)
         is_logged = self.__validate_login__()
         if not is_logged:
-            print("ERROR: Login failed. Check credentials and try again.")
+            print("\tERROR: Login failed. Check credentials and try again.")
             self.kill()
             quit()
 
