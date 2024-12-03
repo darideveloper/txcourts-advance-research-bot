@@ -61,13 +61,15 @@ class SheetsManager ():
         else:
             
             # Loop for each row of data
+            row_index = row
             for row_data in data:
-
-                # Set the position of the next row. Omit the header
-                row_index = data.index(row_data) + row
                 
+                # Write the row in the sheet
                 cell_range = self.get_range(row_index, column, len(row_data))
                 self.worksheet.update(cell_range, [row_data])
+                
+                # Update row index
+                row_index += 1
 
     def get_data(self):
         """ Read all records of the sheet"""

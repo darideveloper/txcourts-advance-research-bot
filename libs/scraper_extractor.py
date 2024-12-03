@@ -274,6 +274,7 @@ class Scraper(ScraperLogin):
         # Go next page
         self.click_js(selectors["next"])
         self.__wait_loading__()
+        self.refresh_selenium()
         
         # Validate if there is a next page
         next_page_btn = self.get_elems(selectors["next"])

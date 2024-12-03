@@ -39,6 +39,12 @@ class DataManager(SheetsManager):
 
         rows = []
         for case_data in cases_data:
+            
+            # Skip empty cases
+            if not case_data or not case_data["description"]:
+                continue
+            
+            # Format row
             row = [
                 case_data["description"],
                 case_data["number"],

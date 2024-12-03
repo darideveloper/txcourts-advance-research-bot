@@ -1,4 +1,5 @@
 import os
+from time import sleep
 
 from dotenv import load_dotenv
 
@@ -51,6 +52,7 @@ def main():
         
         # Save data to excel
         data_manager.write_output_data(cases_data)
+        sleep(2)
         
         # Go to the next
         has_next_page = scraper.go_next_page()
