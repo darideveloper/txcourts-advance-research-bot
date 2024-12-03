@@ -1,6 +1,5 @@
 import os
 from time import sleep
-from datetime import datetime
 
 from libs.scraper_login import ScraperLogin
 from libs.decorators import save_screnshot
@@ -245,9 +244,16 @@ class Scraper(ScraperLogin):
         cases_data = []
         for index in range(rows_num):
             case_data = {}
+            
+            # Get data from selectors
             for selector_name, selector_value in selectors["data"].items():
                 selector = f'{selectors["row"]}:nth-child({index + 1}) {selector_value}'
                 case_data[selector_name] = self.get_text(selector)
+                
+            # Add type
+            case_data["type"] = self.case_type
+            
+            # Save row
             cases_data.append(case_data)
         
         return cases_data

@@ -67,7 +67,7 @@ class SheetsManager ():
                 row_index = data.index(row_data) + row
                 
                 cell_range = self.get_range(row_index, column, len(row_data))
-                self.worksheet.update(cell_range, data)
+                self.worksheet.update(cell_range, [row_data])
 
     def get_data(self):
         """ Read all records of the sheet"""

@@ -1,10 +1,9 @@
 import os
-from time import sleep
 
 from dotenv import load_dotenv
 
 from libs.scraper_extractor import Scraper
-# from libs.data_manager import DataManager
+from libs.data_manager import DataManager
 
 # Env variables
 load_dotenv()
@@ -31,7 +30,7 @@ def main():
     print("TXCourts (Advance) Research Bot")
     print("----------------------------------\n")
 
-    # data_manager = DataManager(GOOGLE_SHEET_LINK, creds_path, SHEET_OUTPUT)
+    data_manager = DataManager(GOOGLE_SHEET_LINK, creds_path, SHEET_OUTPUT)
 
     # Start scraper
     scraper = Scraper(USER_EMAIL, USER_PASSWORD, not SHOW_BROWSER, debug=DEBUG)
@@ -47,8 +46,11 @@ def main():
         
         # Get cases data
         cases_data = scraper.get_current_cases_data()
+        if not cases_data:
+            break
         
-        # TODO: Save data to excel
+        # Save data to excel
+        data_manager.write_output_data(cases_data)
         
         # Go to the next
         has_next_page = scraper.go_next_page()
